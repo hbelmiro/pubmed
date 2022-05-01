@@ -1,32 +1,22 @@
 package com.thegreatapi;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
-public class App {
+public final class App {
 
-    public static void main(String[] args) {
-        Parser parser = new Parser();
+    public static void main(String[] args) throws IOException {
+        var properties = new Properties();
+        properties.load(App.class.getResourceAsStream("/query.properties"));
 
-        List<Article> articles1 = parser.parseFile("src/main/resources/1.csv");
-        List<Article> articles2 = parser.parseFile("src/main/resources/2.csv");
-        List<Article> articles3 = parser.parseFile("src/main/resources/3.csv");
+        var parser = new Parser(properties);
 
-        List<Article> allArticles = new ArrayList<>(articles1);
-        allArticles.addAll(articles2);
-        allArticles.addAll(articles3);
+        Map<Article, List<String>> parseResult = parser.parse();
 
-        Map<Article, Integer> map = new HashMap<>();
-
-        allArticles.forEach(article -> {
-            map.compute(article, (k, v) -> v == null ? 1 : v + 1);
-        });
-
-        map.entrySet().stream()
-           .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
-           .forEach(e -> System.out.println(e.getKey() + " " + e.getValue()));
-
+        parseResult.entrySet().stream()
+                   .sorted((e1, e2) -> e2.getValue().size() - e1.getValue().size())
+                   .forEach(e -> System.out.println(e.getKey().getPmid() + " (" + e.getValue().size() + ") " + e.getValue()));
     }
 }
