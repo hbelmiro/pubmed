@@ -7,7 +7,7 @@ import java.util.Properties;
 
 public final class App {
 
-    private static final List<String> ESSENTIALS = List.of("human-microbiota-dysbiosis");
+    private static final List<String> ESSENTIALS = List.of("human-microbiota-dysbiosis", "symbiotic-microbiota");
 
     public static void main(String[] args) throws IOException {
 
@@ -30,11 +30,14 @@ public final class App {
         System.out.println("Quantidade de artigos com as queries essenciais e mais uma: "
                 + getTotalThatHaveEssentials(parseResult) + System.lineSeparator());
 
+        System.out.println("| Artigo   | Quantidade de consultas | Consultas |");
+        System.out.println("| -------- | ----------------------- | --------- |");
+
         parseResult.entrySet().stream()
                    .filter(entry -> entry.getValue().size() > 1)
                    .filter(entry -> mustHave(ESSENTIALS, entry))
                    .sorted((e1, e2) -> e2.getValue().size() - e1.getValue().size())
-                   .forEach(e -> System.out.println(e.getKey().getPmid() + " (" + e.getValue().size() + ") " + e.getValue()));
+                   .forEach(e -> System.out.println("| " + e.getKey().getPmid() + " |                       " + e.getValue().size() + " | " + e.getValue() + " |"));
 
 //        System.out.println(System.lineSeparator() + "Todos os artigos: " + System.lineSeparator());
 //
@@ -44,7 +47,7 @@ public final class App {
     }
 
     private static boolean mustHave(List<String> essentialQueries, Map.Entry<Article, List<String>> entry) {
-        return essentialQueries.stream().anyMatch(entry.getValue()::contains);
+        return entry.getValue().containsAll(essentialQueries);
     }
 
     private static long getTotalThatHaveEssentials(Map<Article, List<String>> parseResult) {

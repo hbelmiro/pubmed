@@ -23,17 +23,15 @@ final class Parser {
 
         properties.forEach((queryId, query) -> {
             List<Article> articles = parseFile("src/main/resources/" + queryId + ".csv");
-            articles.forEach(article -> {
-                parseResult.compute(article, (key, value) -> {
-                    if (value == null) {
-                        return List.of(query.toString());
-                    } else {
-                        List<String> newList = new ArrayList<>(value);
-                        newList.add(query.toString());
-                        return newList;
-                    }
-                });
-            });
+            articles.forEach(article -> parseResult.compute(article, (key, value) -> {
+                if (value == null) {
+                    return List.of(query.toString());
+                } else {
+                    List<String> newList = new ArrayList<>(value);
+                    newList.add(query.toString());
+                    return newList;
+                }
+            }));
         });
 
         return parseResult;
